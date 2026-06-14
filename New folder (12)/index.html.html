@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuwan & Dilki's Wedding Invitation</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Marcellus&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #bfa15f; 
+            --text-dark: #2c2519;
+            /* Cards made highly transparent with stronger blur for perfect image visibility */
+            --bg-card: rgba(255, 255, 255, 0.45); 
+            --bg-overlay: rgba(255, 254, 248, 0.45); 
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body, html {
+            height: 100%;
+            overflow-x: hidden;
+            background-color: #f5f0e6;
+        }
+
+        /* --- Envelope Wrapper --- */
+        .envelope-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f5f0e6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: transform 1.2s ease-in-out, opacity 1.2s ease-in-out;
+            padding: 20px;
+        }
+
+        .envelope-container {
+            position: relative;
+            margin-bottom: 20px;
+            max-width: 100%;
+        }
+
+        .envelope {
+            position: relative;
+            width: 320px;
+            max-width: 100%;
+            height: 220px;
+            background: #dfd5bf;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            cursor: pointer;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            transform-style: preserve-3d;
+        }
+
+        .envelope:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 110px solid #c5b699;
+            transform-origin: top;
+            transition: transform 0.4s 0.4s ease-in-out;
+            z-index: 3;
+        }
+
+        .envelope.open:before {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        .letter {
+            position: absolute;
+            bottom: 5px;
+            left: 10px;
+            width: 300px;
+            height: 200px;
+            background: #fff;
+            text-align: center;
+            padding: 20px;
+            border-radius: 5px;
+            transition: transform 0.5s ease-in-out;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+            border: 1px solid #f0e9dd;
+        }
+
+        .letter h3 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.2rem;
+            color: var(--text-dark);
+        }
+
+        .envelope.open .letter {
+            transform: translateY(-100px);
+        }
+
+        .guest-label-outer {
+            color: var(--text-dark);
+            text-align: center;
+            margin-top: 15px;
+            background: #fff;
+            padding: 10px 30px;
+            border-radius: 40px;
+            border: 1px solid var(--primary-color);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            max-width: 90%;
+        }
+
+        .guest-label-outer span {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: block;
+            color: #888;
+        }
+
+        .guest-name-display {
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: var(--primary-color);
+            line-height: 1.2;
+            margin-top: 2px;
+        }
+
+        .click-to-open {
+            font-size: 0.8rem;
+            color: var(--text-dark);
+            letter-spacing: 3px;
+            margin-top: 20px;
+            animation: blink 1.5s infinite;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* --- Main Content Section --- */
+        .main-content {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1.5s ease-in-out;
+            min-height: 100vh;
+            position: relative;
+            /* High resolution dynamic placeholder to show immediately if offline */
+            background-image: url('https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1920');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* Background Slideshow Layer Box */
+        .slideshow-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; /* Pushed up to override background color layers */
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        .slideshow-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.35); /* Elegant light frosting */
+            z-index: 2;
+        }
+
+        .slide:nth-child(1) { background-image: url('https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1920'); }
+        .slide:nth-child(2) { background-image: url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1920'); }
+        .slide:nth-child(3) { background-image: url('https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=1920'); }
+
+        /* Container Content Layout */
+        .container {
+            position: relative;
+            max-width: 480px;
+            margin: 0 auto;
+            text-align: center;
+            color: var(--text-dark);
+            padding: 40px 15px;
+            z-index: 10; /* Placed explicitly above the image slideshow layers */
+        }
+
+        header h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 4.5rem;
+            color: #2c2519;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 15px rgba(255,255,255,0.8);
+        }
+
+        header p {
+            font-family: 'Marcellus', serif;
+            font-size: 0.95rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #443a29;
+            text-shadow: 1px 1px 10px rgba(255,255,255,0.8);
+        }
+
+        .section-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            padding: 30px 20px;
+            border-radius: 20px;
+            margin: 25px 0;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Personalized Guest Card */
+        .personal-invite-box {
+            border: 2px double var(--primary-color);
+            background: rgba(255, 255, 255, 0.7);
+        }
+        .personal-invite-box h4 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #666;
+        }
+
+        /* Countdown Grid (Mobile Responsive) */
+        .countdown {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 8px;
+        }
+
+        .countdown-item {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 10px 5px;
+            border-radius: 12px;
+            flex: 1;
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+
+        .countdown-item span {
+            display: block;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* --- VISUAL CALENDAR PAGE --- */
+        .calendar-container {
+            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #eedcb5;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .calendar-month {
+            font-family: 'Marcellus', serif;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .calendar-days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            font-size: 0.85rem;
+        }
+        .calendar-day-name {
+            font-weight: 600;
+            color: #777;
+            padding-bottom: 5px;
+        }
+        .calendar-number {
+            padding: 6px 0;
+            color: #333;
+        }
+        .calendar-number.wedding-day {
+            background: var(--primary-color);
+            color: #ffffff !important;
+            font-weight: bold;
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(191, 161, 95, 0.5);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+        .empty-day { opacity: 0; }
+
+        /* Action Controls */
+        .btn {
+            display: inline-block;
+            background: var(--primary-color);
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(191, 161, 95, 0.3);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: #333;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .btn-whatsapp {
+            background: #25D366;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2);
+        }
+        .btn-whatsapp:hover {
+            background: #1ebd54;
+        }
+
+        /* Floating Controller */
+        .music-control {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 1000;
+            background: #ffffff;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BACKGROUND MUSIC ENGINE -->
+    <audio id="bgMusic" loop>
+        <source src="C:\Users\BIMSARA\Desktop\Downloads\New folder (12)\110_THE_MOMENT_-_KENNY_G_(mp3.pm).mp3">
+    </audio>
+
+    <!-- 1. ENVELOPE COVER SCREEN -->
+    <div class="envelope-wrapper" id="envelopeWrapper">
+        <div class="envelope-container" onclick="openEnvelope()">
+            <div class="envelope" id="mainEnvelope">
+                <div class="letter">
+                    <h3 style="font-family: 'Great Vibes', cursive;">Nuwan & Dilki</h3>
+                    <p style="font-size: 11px; margin-top: 5px;">Wedding Invitation</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="guest-label-outer">
+            <span>Specially Invited</span>
+            <div class="guest-name-display" id="envelopeGuestName">Kamal & Family</div>
+        </div>
+        
+        <div class="click-to-open" onclick="openEnvelope()"><i class="fa-solid fa-envelope-open"></i> Tap to open invitation</div>
+    </div>
+
+    <!-- 2. MAIN CARD MAIN CONTENT -->
+    <div class="main-content" id="mainContent">
+        <!-- Slideshow Background Core Layers -->
+        <div class="slideshow-container">
+            <div class="slide"></div>
+            <div class="slide"></div>
+            <div class="slide"></div>
+        </div>
+        <div class="slideshow-overlay"></div>
+
+        <!-- Floating Action Button -->
+        <div class="music-control" id="musicBtn" onclick="toggleMusic()">
+            <i class="fa-solid fa-volume-high" id="musicIcon"></i>
+        </div>
+
+        <div class="container">
+            <header>
+                <p>Save Our Date</p>
+                <h1>Nuwan & Dilki</h1>
+                <p>Are Getting Married</p>
+            </header>
+
+            <!-- Personalized Section Card -->
+            <div class="section-card personal-invite-box">
+                <h4>Dear</h4>
+                <h2 style="font-family: 'Great Vibes', cursive; font-size: 2.8rem; color: var(--primary-color); margin: 5px 0;" id="insideGuestName">Kamal & Family</h2>
+                <p style="font-size: 0.88rem; color: #444; line-height: 1.5;">We request the honor of your presence to celebrate our wedding day journey together.</p>
+            </div>
+
+            <!-- Timing & Visual Calendar Block -->
+            <div class="section-card">
+                <h2 style="color: var(--primary-color); margin-bottom: 5px; font-family: 'Marcellus', serif; font-size: 1.3rem;"><i class="fa-regular fa-calendar-check"></i> Wedding Date</h2>
+                
+                <!-- Real Calendar Component -->
+                <div class="calendar-container">
+                    <div class="calendar-month">August 2026</div>
+                    <div class="calendar-days-grid">
+                        <div class="calendar-day-name">S</div>
+                        <div class="calendar-day-name">M</div>
+                        <div class="calendar-day-name">T</div>
+                        <div class="calendar-day-name">W</div>
+                        <div class="calendar-day-name">T</div>
+                        <div class="calendar-day-name">F</div>
+                        <div class="calendar-day-name">S</div>
+                        
+                        <!-- Empty cells padding for August 2026 start day layout -->
+                        <div class="empty-day"></div><div class="empty-day"></div><div class="empty-day"></div>
+                        <div class="empty-day"></div><div class="empty-day"></div><div class="empty-day"></div>
+                        
+                        <div class="calendar-number">1</div>
+                        <div class="calendar-number">2</div><div class="calendar-number">3</div>
+                        <div class="calendar-number">4</div><div class="calendar-number">5</div>
+                        <div class="calendar-number">6</div><div class="calendar-number">7</div>
+                        <div class="calendar-number">8</div>
+                        <!-- Targeted August 09 Highlight Circle -->
+                        <div class="calendar-number wedding-day" title="Our Big Day!">9</div>
+                        <div class="calendar-number">10</div><div class="calendar-number">11</div>
+                        <div class="calendar-number">12</div><div class="calendar-number">13</div>
+                        <div class="calendar-number">14</div><div class="calendar-number">15</div>
+                        <div class="calendar-number">16</div><div class="calendar-number">17</div>
+                        <div class="calendar-number">18</div><div class="calendar-number">19</div>
+                        <div class="calendar-number">20</div><div class="calendar-number">21</div>
+                        <div class="calendar-number">22</div><div class="calendar-number">23</div>
+                        <div class="calendar-number">24</div><div class="calendar-number">25</div>
+                        <div class="calendar-number">26</div><div class="calendar-number">27</div>
+                        <div class="calendar-number">28</div><div class="calendar-number">29</div>
+                        <div class="calendar-number">30</div><div class="calendar-number">31</div>
+                    </div>
+                </div>
+
+                <p style="margin-top: 18px; font-size: 1.05rem; color: #333;">
+                    <i class="fa-regular fa-clock" style="color: var(--primary-color);"></i> Poruwa Ceremony: <b>9.30 a.m</b>
+                </p>
+            </div>
+
+            <!-- Countdown Engine UI -->
+            <div class="section-card">
+                <h3 style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: #666;">Time Remaining</h3>
+                <div class="countdown" id="countdown">
+                    <div class="countdown-item"><span id="days">00</span>Days</div>
+                    <div class="countdown-item"><span id="hours">00</span>Hrs</div>
+                    <div class="countdown-item"><span id="minutes">00</span>Min</div>
+                    <div class="countdown-item"><span id="seconds">00</span>Sec</div>
+                </div>
+            </div>
+
+            <!-- Maps Card -->
+            <div class="section-card">
+                <h3 style="color: var(--primary-color); font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; font-family: 'Marcellus', serif;"><i class="fa-solid fa-map-location-dot"></i> Venue Location</h3>
+                <p style="font-size: 1.4rem; margin: 5px 0; font-weight: 600; color: #222;">Kamatha Hotel</p>
+                <p style="color: #666; font-size: 0.95rem; margin-bottom: 5px;">Ambalantota</p>
+                <a href="https://www.google.com/maps/search/?api=1&query=Kamatha+Hotel+Ambalantota" target="_blank" class="btn">
+                    <i class="fa-solid fa-route"></i> View on Map
+                </a>
+            </div>
+
+            <!-- Contact/RSVP Core -->
+            <div class="section-card">
+                <h3 style="font-family: 'Marcellus', serif; letter-spacing: 1px;">RSVP Presence</h3>
+                <p style="font-size: 0.88rem; color: #666; margin-top: 4px;">Please confirm your attendance via WhatsApp</p>
+                <a href="" id="whatsappLink" target="_blank" class="btn btn-whatsapp">
+                    <i class="fa-brands fa-whatsapp"></i> Confirm via WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GUEST NAME SETUP ---
+        const guestName = "Kamal & Family"; 
+        
+        document.getElementById('envelopeGuestName').innerText = guestName;
+        document.getElementById('insideGuestName').innerText = guestName;
+
+        const encodedText = encodeURIComponent(`Hi Nuwan & Dilki, I am ${guestName}. I received your invitation and I'm happy to confirm my attendance!`);
+        document.getElementById('whatsappLink').href = `https://wa.me/94702136686?text=${encodedText}`;
+
+        const audio = document.getElementById('bgMusic');
+        let isMuted = false;
+
+        // --- OPEN ENVELOPE ACTION ---
+        function openEnvelope() {
+            const envelope = document.getElementById('mainEnvelope');
+            const wrapper = document.getElementById('envelopeWrapper');
+            const mainContent = document.getElementById('mainContent');
+
+            envelope.classList.add('open');
+
+            audio.play().catch(error => {
+                console.log("Context tracking caught: ", error);
+            });
+
+            setTimeout(() => {
+                wrapper.style.transform = 'translateY(-100%)';
+                wrapper.style.opacity = '0';
+                mainContent.style.visibility = 'visible';
+                mainContent.style.opacity = '1';
+                
+                startSlideshow();
+            }, 1300);
+        }
+
+        // --- AUDIO TRIGGER TOGGLE ---
+        function toggleMusic() {
+            const icon = document.getElementById('musicIcon');
+            if (!isMuted) {
+                audio.pause();
+                icon.className = "fa-solid fa-volume-xmark";
+                isMuted = true;
+            } else {
+                audio.play();
+                icon.className = "fa-solid fa-volume-high";
+                isMuted = false;
+            }
+        }
+
+        // --- SLIDESHOW CORE ---
+        function startSlideshow() {
+            const slides = document.querySelectorAll('.slide');
+            let currentSlide = 0;
+            slides[0].style.opacity = '1';
+
+            setInterval(() => {
+                slides[currentSlide].style.opacity = '0';
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].style.opacity = '1';
+            }, 5000);
+        }
+
+        // --- COUNTDOWN SCHEDULER ---
+        const targetDate = new Date("August 9, 2026 09:30:00").getTime();
+
+        const countdownInterval = setInterval(() => {
+            const now = new Date().getTime();
+            const difference = targetDate - now;
+
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = days < 10 ? "0" + days : days;
+            document.getElementById("hours").innerText = hours < 10 ? "0" + hours : hours;
+            document.getElementById("minutes").innerText = minutes < 10 ? "0" + minutes : minutes;
+            document.getElementById("seconds").innerText = seconds < 10 ? "0" + seconds : seconds;
+
+            if (difference < 0) {
+                clearInterval(countdownInterval);
+                document.getElementById("countdown").innerHTML = "<h3>Wedding Day Live Now!</h3>";
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
